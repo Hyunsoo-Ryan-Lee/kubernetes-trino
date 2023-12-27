@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: trino-ingress
+  annotations:
+    alb.ingress.kubernetes.io/description: 'trino'
+    alb.ingress.kubernetes.io/load-balancer-name: 'trino-alb'
+  labels:
+    app: trino-ingress
+spec:
+  ingressClassName: alb
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: trino
+            port:
+              number: 8080

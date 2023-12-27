@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hive-initschema
+spec:
+  template:
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution: 
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator : In
+                    values:
+                      - mysql
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: hivemeta
+        image: mykidong/hivemetastore:v3.0.0
+        command: ["/opt/hive-metastore/bin/schematool"]
+        args: ["--verbose" ,"-initSchema" , "-dbType", "mysql", "-userName", "root",
+          "-passWord", "910506", "-url", "jdbc:mysql://mysql-service.trino.svc.cluster.local:3306/metastore_db?createDatabaseIfNotExist=true&connectTimeout=1000"]
+      restartPolicy: Never
+  backoffLimit: 4
